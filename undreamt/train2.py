@@ -337,7 +337,8 @@ class Trainer:
         #New loss
         cos = torch.nn.CosineEmbeddingLoss
         losscos=cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
-        self.loss += loss.data[0]
+        # Calculate loss for positive and negative
+        self.loss += loss.data[0] - losscos
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
