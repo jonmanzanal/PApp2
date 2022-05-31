@@ -336,7 +336,7 @@ class Trainer:
         loss, hidden = self.translator.score(src, trg, train=True)
         #New loss
         cos = torch.nn.CosineEmbeddingLoss
-        cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
+        losscos=cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
         self.loss += loss.data[0]
         self.forward_time += time.time() - t
 
