@@ -38,8 +38,8 @@ The data in the above command should be provided as follows:
 - `SRC.MONO.TXT` and `TRG.MONO.TXT` are the source and target language monolingual corpora. They should both be pre-processed so atomic symbols (either tokens or BPE units) are separated by whitespaces. For that purpose, we recommend using [Moses](http://www.statmt.org/moses/) to tokenize and truecase the corpora and, optionally, [Subword-NMT](https://github.com/rsennrich/subword-nmt) if you want to use BPE.
 - `SRC.EMB.TXT` and `TRG.EMB.TXT` are the source and target language cross-lingual embeddings. In order to obtain them, we recommend training monolingual embeddings in the corpora above using either [word2vec](https://github.com/tmikolov/word2vec) or [fasttext](https://github.com/facebookresearch/fastText), and then map them to a shared space using [VecMap](https://github.com/artetxem/vecmap). Please make sure to cutoff the vocabulary as desired before mapping the embeddings.
 - `MODEL_PREFIX` is the prefix of the output model.
-- Emmbeddings, French: http://vectors.nlpl.eu/repository/20/43.zip, English: http://vectors.nlpl.eu/repository/20/40.zip
-- Corpora: https://object.pouta.csc.fi/OPUS-ELRA-W0201/v1/moses/en-fr.txt.zip
+- Emmbeddings, French: https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.fr.vec, English: https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.en.vec
+- Corpora: https://object.pouta.csc.fi/OPUS-Wikipedia/v1.0/moses/en-fr.txt.zip
 
 Using the above settings, training takes about 3 days in a single Titan Xp. Once training is done, you can use the resulting model for translation as follows:
 
