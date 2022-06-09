@@ -142,8 +142,8 @@ def main_train():
         src_embeddings = device(src_embeddings)
         src_embeddings.requires_grad = False
         if embedding_size == 0:
-            embedding_size = src_embeddings.weight.data2.size()[1]
-        if embedding_size != src_embeddings.weight.data2.size()[1]:
+            embedding_size = src_embeddings.weight.data.size()[1]
+        if embedding_size != src_embeddings.weight.data.size()[1]:
             print('Embedding sizes do not match')
             sys.exit(-1)
     if args.trg_embeddings is not None:
