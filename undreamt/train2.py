@@ -23,6 +23,7 @@ import argparse
 import numpy as np
 import sys
 import time
+import undreamt.data2
 
 
 def main_train():
