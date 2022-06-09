@@ -312,7 +312,7 @@ def main_train():
 
 
 class Trainer:
-    def __init__(self, corpus, optimizers, translator, batch_size=50):
+    def __init__(self, corpus, optimizers, translator2, batch_size=50):
         self.corpus = corpus
         self.translator = translator2
         self.optimizers = optimizers
