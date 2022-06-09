@@ -143,9 +143,9 @@ class CorpusReader:
 
 
 class BacktranslatorCorpusReader:
-    def __init__(self, corpus, translator):
+    def __init__(self, corpus, translator2):
         self.corpus = corpus
-        self.translator = translator
+        self.translator2 = translator2
         self.epoch = corpus.epoch
         self.hidden = None
 
