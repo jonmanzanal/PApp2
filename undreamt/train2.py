@@ -104,7 +104,7 @@ def main_train():
 
     # Select device
     device = devices.gpu if args.cuda else devices.cpu
-
+    
     # Create optimizer lists
     src2src_optimizers = []
     trg2trg_optimizers = []
@@ -339,7 +339,7 @@ class Trainer:
         cos = torch.nn.CosineEmbeddingLoss
         losscos=cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
         # Calculate loss for positive and negative
-        self.loss += loss.data[0] - losscos
+        self.loss += loss.data - losscos
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
@@ -388,7 +388,7 @@ class Validator:
         loss = 0
         for i in range(0, self.sentence_count, self.batch_size):
             j = min(i + self.batch_size, self.sentence_count)
-            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data[0]
+            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data
         return np.exp(loss/self.reference_word_count)
 
     def translate(self):
