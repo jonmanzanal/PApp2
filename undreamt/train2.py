@@ -220,32 +220,32 @@ def main_train():
     if args.src is not None:
         f = open(args.src, encoding=args.encoding, errors='surrogateescape')
         corpus = data.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
-        src2src_trainer = Trainer(translator=src2src_translator, optimizers=src2src_optimizers, corpus=corpus, batch_size=args.batch)
+        src2src_trainer = Trainer(translator2=src2src_translator, optimizers=src2src_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(src2src_trainer)
         if not args.disable_backtranslation:
-            trgback2src_trainer = Trainer(translator=trg2src_translator, optimizers=trg2src_optimizers,
-                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator=src2trg_translator), batch_size=args.batch)
+            trgback2src_trainer = Trainer(translator2=trg2src_translator, optimizers=trg2src_optimizers,
+                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator2=src2trg_translator), batch_size=args.batch)
             trainers.append(trgback2src_trainer)
     if args.trg is not None:
         f = open(args.trg, encoding=args.encoding, errors='surrogateescape')
         corpus = data.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
-        trg2trg_trainer = Trainer(translator=trg2trg_translator, optimizers=trg2trg_optimizers, corpus=corpus, batch_size=args.batch)
+        trg2trg_trainer = Trainer(translator2=trg2trg_translator, optimizers=trg2trg_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(trg2trg_trainer)
         if not args.disable_backtranslation:
-            srcback2trg_trainer = Trainer(translator=src2trg_translator, optimizers=src2trg_optimizers,
-                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator=trg2src_translator), batch_size=args.batch)
+            srcback2trg_trainer = Trainer(translator2=src2trg_translator, optimizers=src2trg_optimizers,
+                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator2=trg2src_translator), batch_size=args.batch)
             trainers.append(srcback2trg_trainer)
     if args.src2trg is not None:
         f1 = open(args.src2trg[0], encoding=args.encoding, errors='surrogateescape')
         f2 = open(args.src2trg[1], encoding=args.encoding, errors='surrogateescape')
         corpus = data.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
-        src2trg_trainer = Trainer(translator=src2trg_translator, optimizers=src2trg_optimizers, corpus=corpus, batch_size=args.batch)
+        src2trg_trainer = Trainer(translator2=src2trg_translator, optimizers=src2trg_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(src2trg_trainer)
     if args.trg2src is not None:
         f1 = open(args.trg2src[0], encoding=args.encoding, errors='surrogateescape')
         f2 = open(args.trg2src[1], encoding=args.encoding, errors='surrogateescape')
         corpus = data.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
-        trg2src_trainer = Trainer(translator=trg2src_translator, optimizers=trg2src_optimizers, corpus=corpus, batch_size=args.batch)
+        trg2src_trainer = Trainer(translator2=trg2src_translator, optimizers=trg2src_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(trg2src_trainer)
 
     # Build validators
