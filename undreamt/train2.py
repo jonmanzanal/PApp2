@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from undreamt import devices
+from undreamt import data2
 from undreamt.encoder import RNNEncoder
 from undreamt.decoder import RNNAttentionDecoder
 from undreamt.generator import *
@@ -23,7 +24,6 @@ import argparse
 import numpy as np
 import sys
 import time
-import undreamt.data2
 
 
 def main_train():
