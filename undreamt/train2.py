@@ -115,7 +115,7 @@ def main_train():
     def add_optimizer(module, directions=()):
         if args.param_init != 0.0:
             for param in module.parameters():
-                param.data2.uniform_(-args.param_init, args.param_init)
+                param.data.uniform_(-args.param_init, args.param_init)
         optimizer = torch.optim.Adam(module.parameters(), lr=args.learning_rate)
         for direction in directions:
             direction.append(optimizer)
@@ -152,8 +152,8 @@ def main_train():
         trg_embeddings = device(trg_embeddings)
         trg_embeddings.requires_grad = False
         if embedding_size == 0:
-            embedding_size = trg_embeddings.weight.data2.size()[1]
-        if embedding_size != trg_embeddings.weight.data2.size()[1]:
+            embedding_size = trg_embeddings.weight.data.size()[1]
+        if embedding_size != trg_embeddings.weight.data.size()[1]:
             print('Embedding sizes do not match')
             sys.exit(-1)
     if args.learn_encoder_embeddings:
@@ -339,7 +339,7 @@ class Trainer:
         cos = torch.nn.CosineEmbeddingLoss
         losscos=cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
         # Calculate loss for positive and negative
-        self.loss += loss.data2[0] - losscos
+        self.loss += loss.data[0] - losscos
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
@@ -388,7 +388,7 @@ class Validator:
         loss = 0
         for i in range(0, self.sentence_count, self.batch_size):
             j = min(i + self.batch_size, self.sentence_count)
-            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data2[0]
+            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data[0]
         return np.exp(loss/self.reference_word_count)
 
     def translate(self):
