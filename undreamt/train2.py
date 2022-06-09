@@ -114,7 +114,7 @@ def main_train():
     def add_optimizer(module, directions=()):
         if args.param_init != 0.0:
             for param in module.parameters():
-                param.data.uniform_(-args.param_init, args.param_init)
+                param.data2.uniform_(-args.param_init, args.param_init)
         optimizer = torch.optim.Adam(module.parameters(), lr=args.learning_rate)
         for direction in directions:
             direction.append(optimizer)
@@ -128,36 +128,36 @@ def main_train():
         src_words = [line.strip() for line in f.readlines()]
         if args.cutoff > 0:
             src_words = src_words[:args.cutoff]
-        src_dictionary = data.Dictionary(src_words)
+        src_dictionary = data2.Dictionary(src_words)
     if args.trg_vocabulary is not None:
         f = open(args.trg_vocabulary, encoding=args.encoding, errors='surrogateescape')
         trg_words = [line.strip() for line in f.readlines()]
         if args.cutoff > 0:
             trg_words = trg_words[:args.cutoff]
-        trg_dictionary = data.Dictionary(trg_words)
+        trg_dictionary = data2.Dictionary(trg_words)
     if args.src_embeddings is not None:
         f = open(args.src_embeddings, encoding=args.encoding, errors='surrogateescape')
-        src_embeddings, src_dictionary = data.read_embeddings(f, args.cutoff, src_words)
+        src_embeddings, src_dictionary = data2.read_embeddings(f, args.cutoff, src_words)
         src_embeddings = device(src_embeddings)
         src_embeddings.requires_grad = False
         if embedding_size == 0:
-            embedding_size = src_embeddings.weight.data.size()[1]
-        if embedding_size != src_embeddings.weight.data.size()[1]:
+            embedding_size = src_embeddings.weight.data2.size()[1]
+        if embedding_size != src_embeddings.weight.data2.size()[1]:
             print('Embedding sizes do not match')
             sys.exit(-1)
     if args.trg_embeddings is not None:
         trg_file = open(args.trg_embeddings, encoding=args.encoding, errors='surrogateescape')
-        trg_embeddings, trg_dictionary = data.read_embeddings(trg_file, args.cutoff, trg_words)
+        trg_embeddings, trg_dictionary = data2.read_embeddings(trg_file, args.cutoff, trg_words)
         trg_embeddings = device(trg_embeddings)
         trg_embeddings.requires_grad = False
         if embedding_size == 0:
-            embedding_size = trg_embeddings.weight.data.size()[1]
-        if embedding_size != trg_embeddings.weight.data.size()[1]:
+            embedding_size = trg_embeddings.weight.data2.size()[1]
+        if embedding_size != trg_embeddings.weight.data2.size()[1]:
             print('Embedding sizes do not match')
             sys.exit(-1)
     if args.learn_encoder_embeddings:
-        src_encoder_embeddings = device(data.random_embeddings(src_dictionary.size(), embedding_size))
-        trg_encoder_embeddings = device(data.random_embeddings(trg_dictionary.size(), embedding_size))
+        src_encoder_embeddings = device(data2.random_embeddings(src_dictionary.size(), embedding_size))
+        trg_encoder_embeddings = device(data2.random_embeddings(trg_dictionary.size(), embedding_size))
         add_optimizer(src_encoder_embeddings, (src2src_optimizers, src2trg_optimizers))
         add_optimizer(trg_encoder_embeddings, (trg2trg_optimizers, trg2src_optimizers))
     else:
@@ -167,8 +167,8 @@ def main_train():
         src_decoder_embeddings = src_embeddings
         trg_decoder_embeddings = trg_embeddings
     else:
-        src_decoder_embeddings = device(data.random_embeddings(src_dictionary.size(), embedding_size))
-        trg_decoder_embeddings = device(data.random_embeddings(trg_dictionary.size(), embedding_size))
+        src_decoder_embeddings = device(data2.random_embeddings(src_dictionary.size(), embedding_size))
+        trg_decoder_embeddings = device(data2.random_embeddings(trg_dictionary.size(), embedding_size))
         add_optimizer(src_decoder_embeddings, (src2src_optimizers, trg2src_optimizers))
         add_optimizer(trg_decoder_embeddings, (trg2trg_optimizers, src2trg_optimizers))
     if args.fixed_generator:
@@ -219,32 +219,32 @@ def main_train():
     srcback2trg_trainer = trgback2src_trainer = None
     if args.src is not None:
         f = open(args.src, encoding=args.encoding, errors='surrogateescape')
-        corpus = data.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
+        corpus = data2.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
         src2src_trainer = Trainer(translator2=src2src_translator, optimizers=src2src_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(src2src_trainer)
         if not args.disable_backtranslation:
             trgback2src_trainer = Trainer(translator2=trg2src_translator, optimizers=trg2src_optimizers,
-                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator2=src2trg_translator), batch_size=args.batch)
+                                          corpus=data2.BacktranslatorCorpusReader(corpus=corpus, translator2=src2trg_translator), batch_size=args.batch)
             trainers.append(trgback2src_trainer)
     if args.trg is not None:
         f = open(args.trg, encoding=args.encoding, errors='surrogateescape')
-        corpus = data.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
+        corpus = data2.CorpusReader(f, max_sentence_length=args.max_sentence_length, cache_size=args.cache)
         trg2trg_trainer = Trainer(translator2=trg2trg_translator, optimizers=trg2trg_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(trg2trg_trainer)
         if not args.disable_backtranslation:
             srcback2trg_trainer = Trainer(translator2=src2trg_translator, optimizers=src2trg_optimizers,
-                                          corpus=data.BacktranslatorCorpusReader(corpus=corpus, translator2=trg2src_translator), batch_size=args.batch)
+                                          corpus=data2.BacktranslatorCorpusReader(corpus=corpus, translator2=trg2src_translator), batch_size=args.batch)
             trainers.append(srcback2trg_trainer)
     if args.src2trg is not None:
         f1 = open(args.src2trg[0], encoding=args.encoding, errors='surrogateescape')
         f2 = open(args.src2trg[1], encoding=args.encoding, errors='surrogateescape')
-        corpus = data.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
+        corpus = data2.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
         src2trg_trainer = Trainer(translator2=src2trg_translator, optimizers=src2trg_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(src2trg_trainer)
     if args.trg2src is not None:
         f1 = open(args.trg2src[0], encoding=args.encoding, errors='surrogateescape')
         f2 = open(args.trg2src[1], encoding=args.encoding, errors='surrogateescape')
-        corpus = data.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
+        corpus = data2.CorpusReader(f1, f2, max_sentence_length=args.max_sentence_length, cache_size=args.cache if args.cache_parallel is None else args.cache_parallel)
         trg2src_trainer = Trainer(translator2=trg2src_translator, optimizers=trg2src_optimizers, corpus=corpus, batch_size=args.batch)
         trainers.append(trg2src_trainer)
 
@@ -327,8 +327,8 @@ class Trainer:
         # Read input sentences
         t = time.time()
         src, trg = self.corpus.next_batch(self.batch_size)
-        self.src_word_count += sum([len(data.tokenize(sentence)) + 1 for sentence in src])  # TODO Depends on special symbols EOS/SOS
-        self.trg_word_count += sum([len(data.tokenize(sentence)) + 1 for sentence in trg])  # TODO Depends on special symbols EOS/SOS
+        self.src_word_count += sum([len(data2.tokenize(sentence)) + 1 for sentence in src])  # TODO Depends on special symbols EOS/SOS
+        self.trg_word_count += sum([len(data2.tokenize(sentence)) + 1 for sentence in trg])  # TODO Depends on special symbols EOS/SOS
         self.io_time += time.time() - t
 
         # Compute loss
@@ -338,7 +338,7 @@ class Trainer:
         cos = torch.nn.CosineEmbeddingLoss
         losscos=cos(hidden.view(-1,hidden.shape[-1]),corpus.hidden.view(-1,corpus.hidden.shape[-1]),torch.ones(hidden.shape[0],hidden.shape[1]))
         # Calculate loss for positive and negative
-        self.loss += loss.data[0] - losscos
+        self.loss += loss.data2[0] - losscos
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
@@ -372,12 +372,12 @@ class Validator:
         self.source = source
         self.reference = reference
         self.sentence_count = len(source)
-        self.reference_word_count = sum([len(data.tokenize(sentence)) + 1 for sentence in self.reference])  # TODO Depends on special symbols EOS/SOS
+        self.reference_word_count = sum([len(data2.tokenize(sentence)) + 1 for sentence in self.reference])  # TODO Depends on special symbols EOS/SOS
         self.batch_size = batch_size
         self.beam_size = beam_size
 
         # Sorting
-        lengths = [len(data.tokenize(sentence)) for sentence in self.source]
+        lengths = [len(data2.tokenize(sentence)) for sentence in self.source]
         self.true2sorted = sorted(range(self.sentence_count), key=lambda x: -lengths[x])
         self.sorted2true = sorted(range(self.sentence_count), key=lambda x: self.true2sorted[x])
         self.sorted_source = [self.source[i] for i in self.true2sorted]
@@ -387,7 +387,7 @@ class Validator:
         loss = 0
         for i in range(0, self.sentence_count, self.batch_size):
             j = min(i + self.batch_size, self.sentence_count)
-            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data[0]
+            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data2[0]
         return np.exp(loss/self.reference_word_count)
 
     def translate(self):
