@@ -139,6 +139,7 @@ class ContrastiveTranslator:
         return self.trg_dictionary.ids2sentences(translations)
 
     def score(self, src, trg, train=False):
+        print(f"[DEBUG] Train mode: {train}")
         self._train(train)
 
         # Check batch sizes
