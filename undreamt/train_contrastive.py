@@ -1,3 +1,4 @@
+import torch.nn.functional
 from undreamt import devices
 from undreamt.encoder import RNNEncoder
 from undreamt.decoder import RNNAttentionDecoder
@@ -374,8 +375,7 @@ class ContrastiveTrainer:
         self.optimizers = optimizers
         self.batch_size = batch_size
         self.lambda_factor = lambda_factor
-        self.contrastive_criterion = torch.nn.CosineEmbeddingLoss()
-        self.contrastive_criterion.train(True)
+        self.contrastive_criterion = torch.nn.functional.cosine_embedding_loss
         self.reset_stats()
 
     def step(self):
