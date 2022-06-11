@@ -412,8 +412,6 @@ class ContrastiveTrainer:
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
-        print(f"Encoder: {self.translator.encoder.training}")
-        print(f"Decoder: {self.translator.encoder.training}")
         t = time.time()
         loss.div(self.batch_size).backward()
         for optimizer in self.optimizers:
@@ -459,7 +457,7 @@ class Validator:
         loss = 0
         for i in range(0, self.sentence_count, self.batch_size):
             j = min(i + self.batch_size, self.sentence_count)
-            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).data_contrastive[0]
+            loss += self.translator.score(self.sorted_source[i:j], self.sorted_reference[i:j], train=False).item()
         return np.exp(loss/self.reference_word_count)
 
     def translate(self):
