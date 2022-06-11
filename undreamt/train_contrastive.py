@@ -412,6 +412,8 @@ class ContrastiveTrainer:
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
+        print(f"Encoder: {self.translator.encoder.training}")
+        print(f"Decoder: {self.translator.encoder.training}")
         t = time.time()
         loss.div(self.batch_size).backward()
         for optimizer in self.optimizers:
