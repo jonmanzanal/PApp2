@@ -1,18 +1,3 @@
-# Copyright (C) 2018  Mikel Artetxe <artetxem@gmail.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from undreamt import data, devices
 
 import random
@@ -21,7 +6,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 
-class Translator:
+class ContrastiveTranslator:
     def __init__(self, encoder_embeddings, decoder_embeddings, generator, src_dictionary, trg_dictionary, encoder,
                  decoder, denoising=True, device=devices.default):
         self.encoder_embeddings = encoder_embeddings
@@ -163,8 +148,9 @@ class Translator:
         # Encode
         hidden, context, context_lengths = self.encode(src, train)
         context_mask = self.mask(context_lengths)
-        # Save hidden
-        hiddenencode=hidden
+        
+        # Save hidden representation after the encoder
+        hidden_encoder = hidden
 
         # Decode
         initial_output = self.device(self.decoder.initial_output(len(src)))
@@ -177,4 +163,4 @@ class Translator:
         output_ids_var = self.device(Variable(torch.LongTensor(output_ids), requires_grad=False))
         loss = self.criterion(logprobs.view(-1, logprobs.size()[-1]), output_ids_var.view(-1))
         # Return hidden
-        return loss,hiddenencode
+        return loss, hidden_encoder
