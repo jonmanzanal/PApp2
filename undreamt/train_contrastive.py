@@ -375,6 +375,7 @@ class ContrastiveTrainer:
         self.batch_size = batch_size
         self.lambda_factor = lambda_factor
         self.contrastive_criterion = torch.nn.CosineEmbeddingLoss()
+        self.contrastive_criterion.train(True)
         self.reset_stats()
 
     def step(self):
@@ -394,21 +395,20 @@ class ContrastiveTrainer:
         # Compute loss
         t = time.time()
         cross_entropy_loss, hidden = self.translator.score(src, trg, train=True)
-        # self.contrastive_criterion.train(True)
 
         # Positive Sampling
-        # flattened_hidden = hidden.view(-1, hidden.shape[-1])
-        # flattened_corpus_hidden = self.corpus.hidden.view(-1, self.corpus.hidden.shape[-1])
-        # positive_loss = self.contrastive_criterion(flattened_hidden, flattened_corpus_hidden, torch.ones(flattened_hidden.shape[0]).to(device=flattened_hidden.device))
+        flattened_hidden = hidden.view(-1, hidden.shape[-1])
+        flattened_corpus_hidden = self.corpus.hidden.view(-1, self.corpus.hidden.shape[-1])
+        positive_loss = self.contrastive_criterion(flattened_hidden, flattened_corpus_hidden, torch.ones(flattened_hidden.shape[0]).to(device=flattened_hidden.device))
 
         # Negative Sampling (we take random elements from the batch as negative samples)
-        # negative_indices = random_derangement(flattened_hidden.shape[0])
-        # negative_loss = self.contrastive_criterion(flattened_hidden, flattened_hidden[negative_indices], -1 * torch.ones(flattened_hidden.shape[0]).to(device=flattened_hidden.device))
-        # negative_loss += self.contrastive_criterion(flattened_corpus_hidden, flattened_corpus_hidden[negative_indices], -1 * torch.ones(flattened_corpus_hidden.shape[0]).to(device=flattened_corpus_hidden.device))
+        negative_indices = random_derangement(flattened_hidden.shape[0])
+        negative_loss = self.contrastive_criterion(flattened_hidden, flattened_hidden[negative_indices], -1 * torch.ones(flattened_hidden.shape[0]).to(device=flattened_hidden.device))
+        negative_loss += self.contrastive_criterion(flattened_corpus_hidden, flattened_corpus_hidden[negative_indices], -1 * torch.ones(flattened_corpus_hidden.shape[0]).to(device=flattened_corpus_hidden.device))
 
         # Compute Loss
-        loss = cross_entropy_loss #+ self.lambda_factor * positive_loss + (1 - self.lambda_factor) * negative_loss
-        self.loss = loss.item()
+        loss = cross_entropy_loss + self.lambda_factor * positive_loss + (1 - self.lambda_factor) * negative_loss
+        self.loss += loss.item()
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
