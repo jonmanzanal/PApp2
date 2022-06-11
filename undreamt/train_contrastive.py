@@ -3,7 +3,6 @@ from undreamt import devices
 from undreamt.encoder import RNNEncoder
 from undreamt.decoder import RNNAttentionDecoder
 from undreamt.generator_contrastive import *
-from undreamt.translator import Translator
 from undreamt.translator_contrastive import ContrastiveTranslator
 
 import argparse
@@ -107,7 +106,7 @@ def main_train():
 
     # Select device
     device = devices.gpu if args.cuda else devices.cpu
-
+    
     # Create optimizer lists
     src2src_optimizers = []
     trg2trg_optimizers = []
@@ -316,7 +315,7 @@ def main_train():
 
 
 class Trainer:
-    def __init__(self, corpus, optimizers, translator, batch_size=50):
+    def __init__(self, corpus, optimizers, translator2, batch_size=50):
         self.corpus = corpus
         self.translator = translator
         self.optimizers = optimizers
