@@ -335,7 +335,6 @@ class Trainer:
         t = time.time()
         loss = self.translator.score(src, trg, train=True)
         self.loss += loss.item()
-        print(f"[DEBUG] Loss = {loss}")
         self.forward_time += time.time() - t
 
         # Backpropagate error + optimize
