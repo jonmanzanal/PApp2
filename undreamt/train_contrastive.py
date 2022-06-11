@@ -394,6 +394,7 @@ class ContrastiveTrainer:
         # Compute loss
         t = time.time()
         cross_entropy_loss, hidden = self.translator.score(src, trg, train=True)
+        self.contrastive_criterion.train(True)
 
         # Positive Sampling
         flattened_hidden = hidden.view(-1, hidden.shape[-1])
